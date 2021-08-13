@@ -1,0 +1,471 @@
+<html>
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" />
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Texturina:ital,wght@1,900&display=swap" rel="stylesheet">
+	<title>Time Table Creator</title>
+	<style>
+	#heading {
+		display: block;
+		margin: 0 auto;
+		text-align: center;
+		font-family: 'Texturina', serif;
+		color: #733F00;
+	}
+	/* The snackbar - position it at the bottom and in the middle of the screen */
+	
+	#snackbar {
+		visibility: hidden;
+		/* Hidden by default. Visible on click */
+		min-width: 250px;
+		/* Set a default minimum width */
+		background-color: #333;
+		/* Black background color */
+		color: #fff;
+		/* White text color */
+		text-align: center;
+		/* Centered text */
+		border-radius: 2px;
+		/* Rounded borders */
+		padding: 16px;
+		/* Padding */
+		position: fixed;
+		/* Sit on top of the screen */
+		z-index: 1;
+		/* Add a z-index if needed */
+		bottom: 30px;
+		/* 30px from the bottom */
+		margin: 0 auto;
+	}
+	/* Show the snackbar when clicking on a button (class added with JavaScript) */
+	
+	#snackbar.show {
+		visibility: visible;
+		/* Show the snackbar */
+		/* Add animation: Take 0.5 seconds to fade in and out the snackbar.
+      However, delay the fade out process for 2.5 seconds */
+		-webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+		animation: fadein 0.5s, fadeout 0.5s 2.5s;
+	}
+	/* Animations to fade the snackbar in and out */
+	
+	@-webkit-keyframes fadein {
+		from {
+			bottom: 0;
+			opacity: 0;
+		}
+		to {
+			bottom: 30px;
+			opacity: 1;
+		}
+	}
+	
+	@keyframes fadein {
+		from {
+			bottom: 0;
+			opacity: 0;
+		}
+		to {
+			bottom: 30px;
+			opacity: 1;
+		}
+	}
+	
+	@-webkit-keyframes fadeout {
+		from {
+			bottom: 30px;
+			opacity: 1;
+		}
+		to {
+			bottom: 0;
+			opacity: 0;
+		}
+	}
+	
+	@keyframes fadeout {
+		from {
+			bottom: 30px;
+			opacity: 1;
+		}
+		to {
+			bottom: 0;
+			opacity: 0;
+		}
+	}
+	/* The Modal (background) */
+	
+	.modal {
+		display: none;
+		/* Hidden by default */
+		position: fixed;
+		/* Stay in place */
+		z-index: 1;
+		/* Sit on top */
+		left: 0;
+		top: 0;
+		width: 100%;
+		/* Full width */
+		height: 100%;
+		/* Full height */
+		overflow: auto;
+		/* Enable scroll if needed */
+		background-color: rgb(0, 0, 0);
+		/* Fallback color */
+		background-color: rgba(0, 0, 0, 0.4);
+		/* Black w/ opacity */
+		-webkit-animation-name: mfadeIn;
+		/* Fade in the background */
+		-webkit-animation-duration: 0.4s;
+		animation-name: mfadeIn;
+		animation-duration: 0.4s
+	}
+	/* Modal Content */
+	
+	.modal-content {
+		position: fixed;
+		bottom: 0;
+		background-color: #fefefe;
+		width: 100%;
+		-webkit-animation-name: slideIn;
+		-webkit-animation-duration: 0.4s;
+		animation-name: slideIn;
+		animation-duration: 0.4s
+	}
+	/* The Close Button */
+	
+	.close {
+		color: white;
+		float: right;
+		font-size: 28px;
+		font-weight: bold;
+	}
+	
+	.close:hover,
+	.close:focus {
+		color: #000;
+		text-decoration: none;
+		cursor: pointer;
+	}
+	
+	.modal-header {
+		padding: 2px 16px;
+		background-color: #5cb85c;
+		color: white;
+	}
+	
+	.modal-body {
+		padding: 2px 16px;
+	}
+	
+	.modal-footer {
+		padding: 2px 16px;
+		background-color: #5cb85c;
+		color: white;
+	}
+	/* Add Animation */
+	
+	@-webkit-keyframes slideIn {
+		from {
+			bottom: -300px;
+			opacity: 0
+		}
+		to {
+			bottom: 0;
+			opacity: 1
+		}
+	}
+	
+	@keyframes slideIn {
+		from {
+			bottom: -300px;
+			opacity: 0
+		}
+		to {
+			bottom: 0;
+			opacity: 1
+		}
+	}
+	
+	@-webkit-keyframes mfadeIn {
+		from {
+			opacity: 0
+		}
+		to {
+			opacity: 1
+		}
+	}
+	
+	@keyframes mfadeIn {
+		from {
+			opacity: 0
+		}
+		to {
+			opacity: 1
+		}
+	}
+	
+	[type="date"] {
+		border: 0;
+		clip: rect(0, 0, 0, 0);
+		height: 1px;
+		overflow: hidden;
+		padding: 0;
+		position: absolute !important;
+		white-space: nowrap;
+		width: 1px;
+	}
+	
+	[type="date"] + label {
+		margin: 0 auto;
+		text-align: center;
+		background-color: #f15d22;
+		border-radius: 5px;
+		color: #fff;
+		cursor: pointer;
+		display: block;
+		padding: 7px;
+	}
+	
+	[type="date"]:focus + label,
+	[type="date"] + label:hover {
+		background-color: #F1B722;
+	}
+	/*now*/
+	
+	[type="time"] {
+		border: 0;
+		clip: rect(0, 0, 0, 0);
+		height: 1px;
+		overflow: hidden;
+		padding: 0;
+		position: absolute !important;
+		white-space: nowrap;
+		width: 1px;
+	}
+	
+	[type="time"] + label {
+		margin: 0 auto;
+		text-align: center;
+		background-color: #27D948;
+		border-radius: 5px;
+		color: #fff;
+		cursor: pointer;
+		display: block;
+		padding: 7px;
+	}
+	
+	[type="time"]:focus + label,
+	[type="time"] + label:hover {
+		background-color: #00FFBA;
+	}
+	
+	#taskDesc {
+		margin: 0 auto;
+		display: block;
+		text-align: center;
+	}
+	
+	#taskDesc:focus {
+		border-bottom: 2px solid #0066FF;
+		outline: none;
+	}
+	
+	#logTaskBtn {
+		margin: 0 auto;
+		display: block;
+		padding: 7px;
+		box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+		background-color: #008CFF;
+		border-radius: 5px;
+		border: 0px;
+		color: white;
+		font-size: 20px;
+	}
+	
+	#saveAndDownloadBtn {
+		margin: 0 auto;
+		display: block;
+		padding: 7px;
+		box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+		background-color: #9900FF;
+		border-radius: 5px;
+		border: 0px;
+		color: white;
+		font-size: 20px;
+	}
+	
+	i {
+		padding: 5px;
+	}
+	</style>
+</head>
+
+<body>
+	<h1 id="heading">CREATE Time Table</h1>
+	<hr />
+	<input type="date" id="datePicker" name="birthday">
+	<label id="datePickerLabel" for="datePicker">Pick the Date<i class="fas fa-calendar-day"></i></label>
+	<br />
+	<br />
+	<input type="time" id="timePicker1" />
+	<label id="timePicker1Label" for="timePicker1">Pick Start Time<i class="fas fa-hourglass-start"></i></label>
+	<br />
+	<br />
+	<input type="time" id="timePicker2" />
+	<label id="timePicker2Label" for="timePicker2">Pick End Time<i class="fas fa-hourglass-end"></i></label>
+	<br />
+	<br />
+	<input class="w3-input w3-animate-input" id="taskDesc" type="text" value="Enter Task Label" onclick="removeText()" style="width:43%">
+	<br />
+	<button id="logTaskBtn" onclick="logTask1()">Log Task<i class="fas fa-pen"></i></button>
+	<br />
+	<br />
+	<hr />
+	<button id="saveAndDownloadBtn" onclick="downloadTimeTable()"><strong>Save and Download<i class="fas fa-download"></i></strong></button>
+	<div id="snackbar">Logged Task...Continue entering tasks or save the file.</div>
+	<!-- The Modal -->
+	<div id="myModal" class="modal">
+		<!-- Modal content -->
+		<div class="modal-content">
+			<div class="modal-header"> <span class="close">&times;</span>
+				<h2>File saved</h2> </div>
+			<div class="modal-body">
+				<p id='downloadInfo'></p>
+				<p>Upload it to <a id="linkToManager" href="/Manager.html">Time Table Manager</a> to monitor your tasks and stick to it.</p>
+			</div>
+			<div class="modal-footer">
+				<h3>All the Best!!!</h3> </div>
+		</div>
+	</div>
+	<script type="text/javascript" charset="utf-8">
+	function logTask2() {
+		st = document.getElementById("timePicker1").value;
+		et = document.getElementById("timePicker2").value;
+		toAdd = st + "-" + et + "$" + tsk + "\n";
+		timeTableString = timeTableString + toAdd;
+		showSnackBar();
+		document.getElementById("timePicker1").value = "";
+		document.getElementById("timePicker1Label").innerHTML = 'Pick Start Time <i class="fas fa-hourglass-start"></i>';
+		document.getElementById("timePicker2").value = '';
+		document.getElementById("timePicker2Label").innerHTML = 'Pick End Time<i class="fas fa-hourglass-end"></i>';
+		document.getElementById("taskDesc").value = 'Enter Task Label';
+	}
+
+	function download(filename, text) {
+		var element = document.createElement('a');
+		element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+		element.setAttribute('download', filename);
+		element.style.display = 'none';
+		document.body.appendChild(element);
+		element.click();
+		document.body.removeChild(element);
+	}
+
+	function logTask1() {
+		tsk = document.getElementById("taskDesc").value;
+		if(tsk.includes("$")) {
+			alert("You cannot use the '$' symbol in task label");
+			return
+		}
+		if(document.getElementById("datePicker").value == "") {
+			alert("Please Select the date of the Time Table.")
+			return
+		}
+		if(document.getElementById("timePicker1").value == "") {
+			alert("Please Select the Start Time of the task.")
+			return
+		}
+		if(document.getElementById("timePicker2").value == "") {
+			alert("Please Select the End Time of the task.")
+			return
+		}
+		if((document.getElementById("taskDesc").value == "") || (document.getElementById("taskDesc").value == "Enter Task Label")) {
+			alert("Please enter a Label for the task.")
+			return
+		} else {
+			logTask2();
+		}
+	}
+
+	function downloadTimeTable() {
+		fileTitle = document.getElementById("datePicker").value + "_Time_Table.txt";
+		if(timeTableString != "") {
+			download(fileTitle, timeTableString);
+			showModal();
+		} else {
+			alert("Please log some tasks for the day to save and download your Time Table.")
+		}
+	}
+
+	function showSnackBar() {
+		// Get the snackbar DIV
+		var x = document.getElementById("snackbar");
+		// Add the "show" class to DIV
+		x.className = "show";
+		// After 5 seconds, remove the show class from DIV
+		setTimeout(function() {
+			x.className = x.className.replace("show", "");
+		}, 5000);
+	}
+
+	function showModal() {
+		// Get the modal
+		var modal = document.getElementById("myModal");
+		// Get the <span> element that closes the modal
+		var span = document.getElementsByClassName("close")[0];
+		fileTitle = document.getElementById("datePicker").value + "_Time_Table.txt";
+		document.getElementById('downloadInfo').innerHTML = "Your file <b>" + fileTitle + "</b> has been saved to your device.";
+		modal.style.display = "block";
+		// When the user clicks on <span> (x), close the modal
+		span.onclick = function() {
+				modal.style.display = "none";
+			}
+			// When the user clicks anywhere outside of the modal, close it
+		window.onclick = function(event) {
+			if(event.target == modal) {
+				modal.style.display = "none";
+			}
+		}
+	}
+	document.getElementById('datePicker').addEventListener('change', function() {
+		var month = new Array();
+		month[0] = "January";
+		month[1] = "February";
+		month[2] = "March";
+		month[3] = "April";
+		month[4] = "May";
+		month[5] = "June";
+		month[6] = "July";
+		month[7] = "August";
+		month[8] = "September";
+		month[9] = "October";
+		month[10] = "November";
+		month[11] = "December";
+		dt = document.getElementById('datePicker').value;
+		monthName = month[dt.split("-")[1] - 1];
+		dtFstring = dt.split("-")[2] + " " + monthName + " " + dt.split("-")[0];
+		document.getElementById('datePickerLabel').innerHTML = dtFstring;
+		document.getElementById('datePickerLabel').removeAttribute("for");
+		document.getElementById('datePickerLabel').style.backgroundColor = 'f1b722';
+	});
+	document.getElementById('timePicker1').addEventListener('change', function() {
+		document.getElementById('timePicker1Label').innerHTML = "From " + document.getElementById('timePicker1').value;
+	});
+	document.getElementById('timePicker2').addEventListener('change', function() {
+		document.getElementById('timePicker2Label').innerHTML = "To " + document.getElementById('timePicker2').value;
+	});
+
+	function removeText() {
+		if(document.getElementById("taskDesc").value == "Enter Task Label") {
+			document.getElementById("taskDesc").value = "";
+		}
+	}
+	timeTableString = "";
+	</script>
+</body>
+
+</html>

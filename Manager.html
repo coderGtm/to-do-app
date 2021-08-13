@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" />
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Permanent+Marker&family=Righteous&family=Nerko+One&display=swap" rel="stylesheet">
+	<title>Read Text File</title>
+	<style>
+	#today {
+		width: 90%;
+		font-family: 'Permanent Marker', cursive;
+		font-size: 20px;
+		color: #7fffd4;
+		background-color: #ffa87f;
+		border-left: 5px solid #ffe07f;
+		border-radius: 3px;
+		padding: 8px;
+		margin-bottom: 30px;
+	}
+	
+	[type="file"] {
+		border: 0;
+		clip: rect(0, 0, 0, 0);
+		height: 1px;
+		overflow: hidden;
+		padding: 0;
+		position: absolute !important;
+		white-space: nowrap;
+		width: 1px;
+	}
+	
+	[type="file"] + label {
+		background-color: #f15d22;
+		border-radius: 5px;
+		color: #fff;
+		cursor: pointer;
+		display: inline-block;
+		padding: 7px;
+	}
+	
+	[type="file"]:focus + label,
+	[type="file"] + label:hover {
+		background-color: #F1B722;
+	}
+	
+	[type="file"]:focus + label {
+		outline: 1px dotted #000;
+	}
+	
+	#heading {
+		font-family: 'Righteous', cursive;
+		text-decoration: underline;
+	}
+	
+	input[type="checkbox"] {
+		display: none;
+	}
+	
+	input[type="checkbox"]:checked + label {
+		border-color: #000;
+		background-color: #39ff14;
+		border-right: 7px solid #24b30e;
+		border-top: 0px;
+	}
+	
+	input[type="checkbox"]:checked + label {
+		color: #8d14ff;
+	}
+	
+	#heading {
+		display: none;
+	}
+	
+	.fas {
+		padding: 8px;
+	}
+	
+	.taskLabel {
+		border-top: 0.5px solid #0eb385;
+	}
+	
+	.taskTime {
+		background-color: #ffbf00;
+		color: black;
+		padding: 4px;
+		border-radius: 4px;
+	}
+	
+	.taskDesc {
+		font-family: 'Architects Daughter', cursive;
+		padding-bottom: 10px;
+	}
+	
+	#saveBtn {
+		display: none;
+		box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+		background-color: #2D84F6;
+		border-radius: 5px;
+		border: 0px;
+		color: white;
+		font-size: 20px;
+	}
+	
+	#createTimeTableLink {
+		text-decoration: none;
+		display: block;
+		padding: 7px;
+		box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+		background-color: #ff2200;
+		border-radius: 5px;
+		border: 0px;
+		color: white;
+		font-size: 20px;
+	}
+	
+	#btnAndLink {
+		padding: 10px;
+	}
+	
+	#author {
+		margin: 0;
+		text-align: right;
+		font-size: 1.5em;
+		font-style: italic;
+	}
+	
+	#quotation {
+		font-family: 'Nerko One', cursive;
+		font-size: 20px;
+	}
+	
+	#quoteDiv {
+		display: none;
+		background-color: #d1cfac;
+		color: black;
+		border-left: 5px solid #6C6C59;
+		padding: 15px;
+		-webkit-border-bottom-right-radius: 8px;
+		-webkit-border-top-right-radius: 8px;
+	}
+	
+	#progressBar {
+		width: 0%;
+		background-color: green;
+		border-radius: 20px;
+		border-color: black;
+		text-align: center;
+		transition: 0.5s;
+	}
+	
+	#progressBarDiv {
+		display: none;
+		width: 100%;
+		margin-top: 10px;
+		margin-bottom: 7px;
+		border-radius: 20px;
+		border: 2px solid #606060;
+		background-color: #A6C5B2;
+		color: white;
+		text-align: center;
+		font-style: italic;
+	}
+	</style>
+</head>
+
+<body>
+	<div id="today"></div>
+	<input type="file" name="inputfile" id="inputfile">
+	<label id="inputFileLabel" for="inputfile"><i class="fas fa-file-upload"></i>Choose a Time Table File</label>
+	<blockquote id="quoteDiv">
+		<p id="quotation"></p>
+		<footer id="author"></footer>
+	</blockquote>
+	<h1 id='heading'>Today's Tasks<i class="fas fa-tasks"></i></h1>
+	<br>
+	<div id="taskList"></div>
+	<div id="progressBarDiv">
+		<div id="progressBar"></div> <span id="tempText">Headstart now!!!</span> </div>
+	<div id="btnAndLink">
+		<button id="saveBtn" onclick="save()"><i class="fas fa-save"></i>Save Progress</button>
+		<br /> <a id="createTimeTableLink" href="/timeTableCreator.html"><i class="fas fa-list-alt"></i>Create a Free Time Table</a> </div>
+	<script type="text/javascript">
+	document.getElementById('inputfile').addEventListener('change', function() {
+		var fr = new FileReader();
+		fr.onload = function() {
+			var content = fr.result;
+			var tasks = content.split("\n").slice(0, -1); //not including last element as it is \n
+			var myDiv = document.getElementById("taskList");
+			document.getElementById("heading").style.display = "block";
+			try {
+				tasks.forEach(function(task, index) {
+					// creating checkbox element 
+					var checkbox = document.createElement('input');
+					// Assigning the attributes 
+					// to created checkbox 
+					checkbox.type = "checkbox";
+					checkbox.name = "taskCard";
+					checkbox.value = task;
+					checkbox.id = "t" + tasks.indexOf(task);
+					checkbox.style.display = "none";
+					checkbox.setAttribute("onclick", "updateProgressBar()")
+						// creating label for checkbox 
+					var label = document.createElement('label');
+					// assigning attributes for  
+					// the created label tag  
+					label.setAttribute("for", "t" + tasks.indexOf(task));
+					label.style.display = "block";
+					label.setAttribute("class", "taskLabel");
+					// appending the created text to  
+					// the created label tag
+					label.insertAdjacentHTML('beforeend', "<b class='taskTime'>" + task.split("$")[0] + ":  </b>" + "<div class='taskDesc'>" + task.split("$")[1] + "</div>");
+					// appending the checkbox 
+					// and label to div 
+					myDiv.appendChild(checkbox);
+					myDiv.appendChild(label);
+				});
+			} catch {
+				alert("Invalid file format. Please create a file with the Time Table Creator anf upload it.");
+				location.reload(true);
+			}
+			try {
+				markPrvslyDone()
+			} catch {
+				error = true;
+			}
+			document.getElementById("saveBtn").style.display = "block";
+			document.getElementById("inputFileLabel").parentNode.removeChild(document.getElementById("inputFileLabel"));
+			displayQuote();
+			document.getElementById("quoteDiv").style.display = "block";
+			updateProgressBar();
+			document.getElementById("progressBarDiv").style.display = "block";
+		}
+		fr.readAsText(this.files[0]);
+	})
+
+	function markPrvslyDone() {
+		fn = document.getElementById('inputfile').value.split('\\')[2];
+		fn_stored = localStorage.getItem("filename");
+		if(fn == fn_stored) {
+			done = JSON.parse(localStorage.getItem("completedTasksId"));
+			if(done != null) {
+				for(i = 0; i < done.length; i++) {
+					document.getElementById(done[i]).checked = true;
+				}
+			}
+		}
+	}
+
+	function updateProgressBar() {
+		done = [];
+		var checkboxes = document.getElementsByName('taskCard');
+		for(var checkbox of checkboxes) {
+			if(checkbox.checked) done.push(checkbox.id);
+		}
+		total = checkboxes.length;
+		counter = done.length;
+		if(counter == 0) {
+			if(!document.getElementById("progressBarDiv").innerHTML == "Headstart now!!!") {
+				document.getElementById("progressBarDiv").insertAdjacentHTML("beforeend", "<span id='tempText'> Headstart now!!!</span>")
+					//document.getElementById("progressBarDiv"). innerHTML = "Headstart now!!!"
+			}
+			document.getElementById("progressBar").innerHTML = "";
+		} else {
+			try {
+				document.getElementById("tempText").parentNode.removeChild(document.getElementById("tempText"));
+			} catch {
+				//something
+			}
+			pntg = Math.round(counter / total * 100);
+			document.getElementById("progressBar").style.width = pntg.toString() + "%";
+			document.getElementById("progressBar").innerHTML = pntg.toString() + "%";
+		}
+	}
+
+	function save() {
+		done = [];
+		var checkboxes = document.getElementsByName('taskCard');
+		for(var checkbox of checkboxes) {
+			if(checkbox.checked) done.push(checkbox.id);
+		}
+		fn = document.getElementById('inputfile').value.split('\\')[2];
+		localStorage.setItem("completedTasksId", JSON.stringify(done));
+		localStorage.setItem("filename", fn);
+		alert("Saved your Progress. Keep Going...");
+	}
+	var d = new Date();
+	var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+	var month = new Array();
+	month[0] = "January";
+	month[1] = "February";
+	month[2] = "March";
+	month[3] = "April";
+	month[4] = "May";
+	month[5] = "June";
+	month[6] = "July";
+	month[7] = "August";
+	month[8] = "September";
+	month[9] = "October";
+	month[10] = "November";
+	month[11] = "December";
+	var monthName = month[d.getMonth()];
+	var dateInt = d.getDate();
+	var dayName = days[d.getDay()];
+	document.getElementById("today").innerHTML = dayName + ', ' + dateInt + " " + monthName;
+
+	function displayQuote() {
+		quotes = ["The man who does not read books has no advantage over the one who cannot read them.", "Education is the passport to the future, for tomorrow belongs to those who prepare for it today.", "Teachers can open the door, but you must enter it yourself.", "The beautiful thing about learning is that no one can take it away from you.", "Education is the most powerful weapon you can use to change the world.", "The mind is not a vessel to be filled but a fire to be ignited.", "Dont let what you cannot do interfere with what you can do.", "A person who never made a mistake never tried anything new.", "Learning is never done without errors and defeat.", "Never let the fear of striking out stop you from playing the game."];
+		authors = ["Mark Twain", "Malcolm X", "Chinese proverb", "B.B. King", "BB King", "Plutarch", "John Wooden", "Albert Einstein", "Vladimir Lenin", "Babe Ruth"];
+		const random = Math.floor(Math.random() * quotes.length);
+		quote = quotes[random];
+		author = authors[random];
+		document.getElementById("quotation").innerHTML = quote;
+		document.getElementById("author").innerHTML = "~ " + author;
+	}
+	</script>
+</body>
+
+</html>
